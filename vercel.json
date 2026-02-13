@@ -1,0 +1,8 @@
+{
+  "github": {
+    "silent": true
+  },
+  "regions": ["sfo1"],
+  "cleanUrls": true,
+  "framework": "nextjs"
+}
