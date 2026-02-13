@@ -14,7 +14,7 @@ const WaitlistForm = () => {
   const [referralCode, setReferralCode] = useState('');
   const [referredBy, setReferredBy] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     role: 'client',
     name: '',
@@ -39,7 +39,7 @@ const WaitlistForm = () => {
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
     const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-    const interval: any = setInterval(function() {
+    const interval: any = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
       if (timeLeft <= 0) return clearInterval(interval);
       const particleCount = 50 * (timeLeft / duration);
@@ -50,7 +50,7 @@ const WaitlistForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 1. Honeypot check (Bot protection)
     if (formData.website) {
       console.warn('Bot detected via honeypot');
@@ -64,7 +64,7 @@ const WaitlistForm = () => {
       setError('Please wait a moment before trying again.');
       return;
     }
-    
+
     // Reset error state
     setError(null);
 
@@ -90,6 +90,11 @@ const WaitlistForm = () => {
       }
     }
 
+    if (phoneTrimmed && !/^\+?[0-9\s\-]{7,15}$/.test(phoneTrimmed)) {
+      setError('Please enter a valid phone number');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -97,7 +102,7 @@ const WaitlistForm = () => {
       const { error: supabaseError } = await supabase
         .from('waitlist_users')
         .insert([
-          { 
+          {
             role: formData.role,
             name: formData.name.substring(0, 100), // Limit length
             email: emailTrimmed || null,
@@ -118,7 +123,7 @@ const WaitlistForm = () => {
       setLastSubmitTime(now);
       const mockReferral = 'TYEB' + Math.random().toString(36).substring(7).toUpperCase();
       setReferralCode(mockReferral);
-      
+
       setSubmitted(true);
       triggerConfetti();
       gtag.event({ action: 'submit_waitlist', category: 'Conversion', label: emailTrimmed || phoneTrimmed });
@@ -168,7 +173,7 @@ const WaitlistForm = () => {
                     <span className="text-primary font-black text-2xl">172/200</span>
                   </div>
                   <div className="w-full h-4 bg-white rounded-full overflow-hidden border border-gray-100">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: 0 }}
                       whileInView={{ width: '86%' }}
                       transition={{ duration: 2, ease: "easeOut" }}
@@ -214,7 +219,7 @@ const WaitlistForm = () => {
                     >
                       <h3 className="text-4xl font-black mb-4 tracking-tight">Join the Waitlist & Be First to Taste!</h3>
                       <p className="text-white/60 mb-10 font-medium">Choose how you’d like to join and we’ll notify you when TyebLiya launches.</p>
-                      
+
                       <form onSubmit={handleSubmit} className="space-y-8">
                         {/* Role Selection */}
                         <div className="space-y-4">
@@ -328,7 +333,7 @@ const WaitlistForm = () => {
                       <p className="text-xl text-white/60 mb-12 font-medium">
                         Welcome to the TyebLiya family. We'll notify you the moment authentic meals are ready in your area.
                       </p>
-                      
+
                       {/* Referral Section */}
                       <div className="bg-white/5 p-8 rounded-3xl border-2 border-white/10">
                         <p className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-6">Move up the waitlist</p>

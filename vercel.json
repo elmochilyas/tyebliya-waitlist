@@ -2,7 +2,9 @@
   "github": {
     "silent": true
   },
-  "regions": ["sfo1"],
+  "regions": [
+    "cdg1"
+  ],
   "cleanUrls": true,
   "framework": "nextjs"
 }
