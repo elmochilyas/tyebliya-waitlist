@@ -158,13 +158,12 @@ const AppScreens = () => {
                 initial={{ opacity: 0, x: i === 0 ? -80 : i === 2 ? 80 : 0 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, ease: EASE_OUT }}
-                /* GPU-only animated properties via style — no layout triggers */
                 animate={{
                   scale: isActive ? 1.1 : 0.9,
                   opacity: isActive ? 1 : 0.55,
                   filter: isActive ? 'grayscale(0)' : 'grayscale(0.5)',
                 }}
+                transition={{ duration: DURATION, ease: EASE_OUT }}
                 style={{
                   zIndex: isActive ? 30 : 10,
                   marginLeft: isActive ? -16 : 0,
@@ -173,7 +172,6 @@ const AppScreens = () => {
                   willChange: 'transform, opacity',
                 }}
                 onClick={() => goTo(i)}
-                transition={{ duration: DURATION, ease: EASE_OUT }}
               >
                 <SmartphoneMockup image={screen.image} />
 
@@ -269,8 +267,8 @@ const AppScreens = () => {
                     onClick={() => goTo(i)}
                     aria-label={`Go to screen ${i + 1}`}
                     className={`h-2.5 rounded-full transition-all duration-300 ease-out ${i === currentIndex
-                        ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
-                        : 'w-2.5 bg-gray-200'
+                      ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
+                      : 'w-2.5 bg-gray-200'
                       }`}
                   />
                 ))}
