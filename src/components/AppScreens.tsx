@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, memo } from 'react';
+import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
@@ -26,21 +26,21 @@ const screens = [
   }
 ];
 
-// ─── Premium easing ──────────────────────────────────────────────
+// ─── Premium easing (fast attack, smooth deceleration) ───────────
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const DURATION = 0.35;
 
-// ─── Preload all images on mount ─────────────────────────────────
+// ─── Preload images into browser cache ───────────────────────────
 function useImagePreload(srcs: string[]) {
   useEffect(() => {
     srcs.forEach((src) => {
-      const img = new Image();
+      const img = document.createElement('img');
       img.src = src;
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-// ─── Memoized Smartphone Mockup ─────────────────────────────────
+// ─── Memoized Smartphone Mockup (pure presentational) ────────────
 const SmartphoneMockup = memo(({ image }: { image: string }) => (
   <div className="relative mx-auto w-full max-w-[300px] aspect-[9/19.5]">
     {/* Outer Frame */}
@@ -77,19 +77,33 @@ const SmartphoneMockup = memo(({ image }: { image: string }) => (
 ));
 SmartphoneMockup.displayName = 'SmartphoneMockup';
 
-// ─── Desktop caption (appears under active mockup) ──────────────
-const captionVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: DURATION, ease: EASE_OUT } },
-  exit: { opacity: 0, y: 4, transition: { duration: 0.2, ease: EASE_OUT } },
-};
-
 // ─── Main Component ─────────────────────────────────────────────
 const AppScreens = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
+  const [hasEntered, setHasEntered] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  // Preload every screen image immediately
+  // Preload every screen image on mount
   useImagePreload(screens.map((s) => s.image));
+
+  // Detect when section enters viewport (once)
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasEntered(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   const nextScreen = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % screens.length);
@@ -102,7 +116,10 @@ const AppScreens = () => {
   const goTo = useCallback((i: number) => setCurrentIndex(i), []);
 
   return (
-    <section className="py-32 md:py-48 bg-white overflow-hidden relative">
+    <section
+      ref={sectionRef}
+      className="py-32 md:py-48 bg-white overflow-hidden relative"
+    >
       {/* Visual Divider */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
 
@@ -147,64 +164,92 @@ const AppScreens = () => {
           </motion.p>
         </div>
 
-        {/* ── Desktop Layout: 3-Mockup Spotlight ── */}
-        <div className="hidden lg:flex items-center justify-center gap-0 max-w-7xl mx-auto">
-          {screens.map((screen, i) => {
-            const isActive = i === currentIndex;
+        {/* ── Desktop Layout (lg+): 3 phones side-by-side ── */}
+        <div className="hidden lg:block">
+          <div className="flex items-center justify-center gap-0 max-w-7xl mx-auto pb-28">
+            {screens.map((screen, i) => {
+              const isActive = i === currentIndex;
 
-            return (
+              return (
+                <motion.div
+                  key={screen.id}
+                  className="relative"
+                  // Entrance: stagger from left/right, only runs once
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{
+                    opacity: hasEntered ? (isActive ? 1 : 0.55) : 0,
+                    y: hasEntered ? 0 : 40,
+                    scale: isActive ? 1.1 : 0.9,
+                    filter: isActive ? 'grayscale(0)' : 'grayscale(0.5)',
+                  }}
+                  transition={{
+                    duration: hasEntered ? DURATION : 0.6,
+                    ease: EASE_OUT,
+                    delay: hasEntered ? 0 : i * 0.12,
+                  }}
+                  style={{
+                    zIndex: isActive ? 30 : 10,
+                    marginLeft: isActive ? -16 : 0,
+                    marginRight: isActive ? -16 : 0,
+                    cursor: 'pointer',
+                    willChange: 'transform, opacity',
+                  }}
+                  onClick={() => goTo(i)}
+                >
+                  <SmartphoneMockup image={screen.image} />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Desktop caption — below the phone row */}
+          <div className="text-center">
+            <AnimatePresence mode="wait">
               <motion.div
-                key={screen.id}
-                initial={{ opacity: 0, x: i === 0 ? -80 : i === 2 ? 80 : 0 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                animate={{
-                  scale: isActive ? 1.1 : 0.9,
-                  opacity: isActive ? 1 : 0.55,
-                  filter: isActive ? 'grayscale(0)' : 'grayscale(0.5)',
-                }}
-                transition={{ duration: DURATION, ease: EASE_OUT }}
-                style={{
-                  zIndex: isActive ? 30 : 10,
-                  marginLeft: isActive ? -16 : 0,
-                  marginRight: isActive ? -16 : 0,
-                  cursor: 'pointer',
-                  willChange: 'transform, opacity',
-                }}
-                onClick={() => goTo(i)}
+                key={currentIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25, ease: EASE_OUT }}
               >
-                <SmartphoneMockup image={screen.image} />
-
-                <AnimatePresence mode="wait">
-                  {isActive && (
-                    <motion.div
-                      key={`caption-${screen.id}`}
-                      variants={captionVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-64 text-center"
-                    >
-                      <h4 className="text-2xl font-black text-secondary mb-2">{screen.title}</h4>
-                      <p className="text-sm text-secondary/50 font-bold">{screen.description}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <h4 className="text-2xl font-black text-secondary mb-2">
+                  {screens[currentIndex].title}
+                </h4>
+                <p className="text-sm text-secondary/50 font-bold max-w-xs mx-auto">
+                  {screens[currentIndex].description}
+                </p>
               </motion.div>
-            );
-          })}
+            </AnimatePresence>
+
+            {/* Desktop dot indicators */}
+            <div className="flex justify-center gap-3 mt-8">
+              {screens.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  aria-label={`Go to screen ${i + 1}`}
+                  className={`h-2.5 rounded-full transition-all duration-300 ease-out ${i === currentIndex
+                      ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
+                      : 'w-2.5 bg-gray-200 hover:bg-gray-300'
+                    }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* ── Mobile Layout: Stacked Instant-Switch ── */}
+        {/* ── Mobile / Tablet Layout (<lg): Stacked instant-switch ── */}
         <div className="lg:hidden relative">
           <div className="flex flex-col items-center">
             {/*
               All 3 screens live in the DOM simultaneously.
-              Active screen: opacity 1, scale 1.
-              Inactive screens: opacity 0, scale 0.97, pointer-events none.
+              Active = opacity 1, scale 1. Inactive = opacity 0, scale 0.97.
               → Zero unmount/remount. Zero image reload. Instant switch.
             */}
-            <div className="relative w-full max-w-[320px] mx-auto" style={{ aspectRatio: '9/19.5' }}>
+            <div
+              className="relative w-full max-w-[320px] mx-auto"
+              style={{ aspectRatio: '9/19.5' }}
+            >
               {screens.map((screen, i) => (
                 <motion.div
                   key={screen.id}
@@ -267,8 +312,8 @@ const AppScreens = () => {
                     onClick={() => goTo(i)}
                     aria-label={`Go to screen ${i + 1}`}
                     className={`h-2.5 rounded-full transition-all duration-300 ease-out ${i === currentIndex
-                      ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
-                      : 'w-2.5 bg-gray-200'
+                        ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
+                        : 'w-2.5 bg-gray-200'
                       }`}
                   />
                 ))}

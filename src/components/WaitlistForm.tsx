@@ -14,6 +14,7 @@ const WaitlistForm = () => {
   const [referralCode, setReferralCode] = useState('');
   const [referredBy, setReferredBy] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
 
   const [formData, setFormData] = useState({
     role: 'client',
@@ -26,6 +27,7 @@ const WaitlistForm = () => {
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) {
@@ -123,6 +125,7 @@ const WaitlistForm = () => {
       setLastSubmitTime(now);
       const mockReferral = 'TYEB' + Math.random().toString(36).substring(7).toUpperCase();
       setReferralCode(mockReferral);
+      setShareUrl(`${window.location.origin}?ref=${mockReferral}`);
 
       setSubmitted(true);
       triggerConfetti();
@@ -135,7 +138,7 @@ const WaitlistForm = () => {
     }
   };
 
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}?ref=${referralCode}` : '';
+  // shareUrl is computed in handleSubmit after referralCode is generated (avoids SSR hydration mismatch)
 
   return (
     <section id="waitlist" className="py-24 md:py-32 bg-white relative overflow-hidden">
