@@ -3,24 +3,30 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { GA_MEASUREMENT_ID } from "@/lib/gtag";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",            // Eliminate FOIT
+  preload: true,              // Preload critical font
+  variable: "--font-inter",   // CSS variable for flexibility
+});
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,  // Allow zooming for accessibility
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tyebliya.com"),
-  title: "TyebLiya | Authentic Home-Cooked Meals Waitlist",
-  description: "Join the waitlist for TyebLiya and get authentic home-cooked meals delivered to your doorstep. Be the first to taste the revolution!",
-  keywords: ["homemade food", "delivery", "home-cooked meals", "TyebLiya", "waitlist"],
-  authors: [{ name: "TyebLiya Team" }],
+  title: "TyebLiya — Home Food, Made with Heart",
+  description: "Morocco's first home chef marketplace. Order authentic home-cooked meals from verified local chefs, delivered fresh to your door.",
+  keywords: ["home food", "home chef", "Morocco", "delivery", "homemade meals", "TyebLiya", "marketplace"],
+  authors: [{ name: "TyebLiya" }],
   openGraph: {
-    title: "TyebLiya | Authentic Home-Cooked Meals Waitlist",
-    description: "Join the waitlist for TyebLiya and get authentic home-cooked meals delivered to your doorstep.",
+    title: "TyebLiya — Home Food, Made with Heart",
+    description: "Morocco's first home chef marketplace. Order authentic home-cooked meals from verified local chefs.",
     url: "https://tyebliya.com",
     siteName: "TyebLiya",
     images: [
@@ -28,7 +34,7 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "TyebLiya - Authentic Home-Cooked Meals",
+        alt: "TyebLiya — Home Food, Made with Heart",
       },
     ],
     locale: "en_US",
@@ -36,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TyebLiya | Authentic Home-Cooked Meals Waitlist",
-    description: "Join the waitlist for TyebLiya and get authentic home-cooked meals delivered to your doorstep.",
+    title: "TyebLiya — Home Food, Made with Heart",
+    description: "Morocco's first home chef marketplace. Order authentic home-cooked meals from verified local chefs.",
     images: ["/og-image.svg"],
   },
 };
@@ -48,9 +54,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body className={inter.className}>
-        {/* Google Analytics */}
+        {/* Google Analytics — non-blocking */}
         {GA_MEASUREMENT_ID && (
           <>
             <Script
@@ -73,7 +79,9 @@ export default function RootLayout({
             />
           </>
         )}
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -2,7 +2,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, UtensilsCrossed, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Star, ShieldCheck, Heart } from 'lucide-react';
+import { EASE, DURATION, VIEWPORT } from '@/lib/motion';
+
+const AVATAR_COLORS = ['#FF6B35', '#2E3E4E', '#E8723A', '#4A6B8A', '#D4542B'];
 
 const Hero = () => {
   const scrollToWaitlist = () => {
@@ -12,84 +15,97 @@ const Hero = () => {
     }
   };
 
-  const screens = [
-    { title: "Browse Chefs", image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=600&h=1200" },
-    { title: "Authentic Menu", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=600&h=1200" },
-  ];
-
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-32 pb-32 overflow-hidden bg-[#F8FAFC]">
-      {/* Dynamic Background Elements */}
-      <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[140px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-accent/40 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
+    <section className="relative flex items-center pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-[#F8FAFC]">
+      <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[400px] h-[400px] bg-accent/40 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="container px-4 mx-auto relative z-10">
-        <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-6xl mx-auto px-6 relative z-10 w-full">
+        <div className="max-w-3xl mx-auto text-center">
+          {/* Badge */}
           <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: DURATION.normal, ease: EASE }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-white rounded-xl shadow-sm border border-gray-100 text-primary font-bold text-[11px] tracking-[0.2em] uppercase">
+              <Heart size={12} fill="currentColor" />
+              <span>Morocco&apos;s Home Chef Marketplace</span>
+            </div>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: DURATION.slow, ease: EASE, delay: 0.08 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-secondary leading-tight mb-6 tracking-tight"
           >
-            {/* Premium Badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 mb-10 bg-white rounded-2xl shadow-sm border border-gray-100 text-primary font-bold text-xs tracking-[0.2em] uppercase">
-              <Sparkles size={14} className="animate-spin-slow" />
-              <span>The Future of Local Dining</span>
-            </div>
+            Home Food,{' '}
+            <span className="text-primary italic relative inline-block">
+              Made with Heart.
+              <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M1 9C50 2 150 2 199 9" stroke="#FF6B35" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </span>
+          </motion.h1>
 
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-secondary leading-[0.9] mb-10 tracking-tighter">
-              Discover Real <br />
-              <span className="text-primary italic relative inline-block">
-                Local Food
-                <svg className="absolute -bottom-2 left-0 w-full" height="10" viewBox="0 0 200 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 9C50 2 150 2 199 9" stroke="#FF6B35" strokeWidth="3" strokeLinecap="round"/>
-                </svg>
-              </span> <br />
-              — Straight from Chefs!
-            </h1>
-            
-            <p className="text-xl md:text-3xl text-secondary/60 mb-14 leading-relaxed max-w-3xl mx-auto font-medium">
-              Join TyebLiya early access and taste authentic meals in your city. Experience the flavor of tradition, delivered to your door.
-            </p>
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: DURATION.normal, ease: EASE, delay: 0.16 }}
+            className="text-base md:text-lg text-secondary/60 mb-10 leading-relaxed max-w-lg mx-auto"
+          >
+            TyebLiya connects you with verified home chefs in your city. Order real home-cooked meals — made fresh, delivered to your door.
+          </motion.p>
 
-            <div className="flex flex-col items-center gap-10">
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 25px 50px -12px rgba(255,107,53,0.5)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={scrollToWaitlist}
-                className="w-full sm:w-auto px-16 py-8 bg-primary text-white font-black text-2xl rounded-3xl shadow-2xl shadow-primary/30 flex items-center justify-center gap-4 transition-all"
-              >
-                Join the Waitlist
-                <ArrowRight size={28} />
-              </motion.button>
-              
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex -space-x-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="w-14 h-14 rounded-full border-4 border-white bg-gray-100 overflow-hidden shadow-xl">
-                      <img src={`https://i.pravatar.cc/150?img=${i + 20}`} alt="User" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex text-yellow-400">
-                    {[1, 2, 3, 4, 5].map((s) => <Star key={s} size={18} fill="currentColor" />)}
+          {/* CTA + Social proof */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: DURATION.normal, ease: EASE, delay: 0.24 }}
+            className="flex flex-col items-center gap-8"
+          >
+            <button
+              onClick={scrollToWaitlist}
+              className="group w-full sm:w-auto px-10 py-4 bg-primary text-white font-bold text-lg rounded-2xl shadow-lg shadow-primary/15 flex items-center justify-center gap-3 transition-all duration-200 ease-out hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Get Early Access
+              <ArrowRight size={20} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex -space-x-3">
+                {AVATAR_COLORS.map((color, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full border-[3px] border-white overflow-hidden shadow-md flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: color }}>
+                    {String.fromCharCode(65 + i)}
                   </div>
-                  <span className="text-lg font-black text-secondary tracking-tight">2,500+ Foodies joined already</span>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex text-yellow-400">
+                  {[1, 2, 3, 4, 5].map((s) => <Star key={s} size={14} fill="currentColor" />)}
                 </div>
+                <span className="text-sm font-bold text-secondary/60">2,500+ people already joined</span>
               </div>
             </div>
+          </motion.div>
 
-            {/* Trust Indicators */}
-            <div className="mt-24 pt-10 border-t border-gray-100 flex flex-wrap justify-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-              <div className="flex items-center gap-3 font-black text-secondary text-lg">
-                <ShieldCheck size={24} />
-                <span>Secure Payments</span>
-              </div>
-              <div className="flex items-center gap-3 font-black text-secondary text-lg">
-                <UtensilsCrossed size={24} />
-                <span>Verified Chefs</span>
-              </div>
+          {/* Trust badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            transition={{ duration: DURATION.slow, ease: EASE, delay: 0.4 }}
+            className="mt-14 pt-8 border-t border-gray-100 flex flex-wrap justify-center gap-8"
+          >
+            <div className="flex items-center gap-2 font-bold text-secondary text-sm">
+              <ShieldCheck size={18} />
+              <span>Verified Chefs</span>
+            </div>
+            <div className="flex items-center gap-2 font-bold text-secondary text-sm">
+              <Heart size={18} />
+              <span>Made in Morocco</span>
             </div>
           </motion.div>
         </div>

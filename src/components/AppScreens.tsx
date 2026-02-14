@@ -1,78 +1,57 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { EASE, DURATION, REVEAL, REVEAL_DELAY, VIEWPORT } from '@/lib/motion';
 
-// ─── Data ────────────────────────────────────────────────────────
+// ─── Screen data ─────────────────────────────────────────────────
 const screens = [
   {
     id: 1,
-    title: "Discover Local Chefs",
+    title: "Meet Your Chef",
     image: "/images/screens/screen1.jpeg",
-    description: "Meet the talented masters behind your favorite traditional meals."
+    description: "Browse verified home chefs in your neighborhood. See their specialties, reviews, and story."
   },
   {
     id: 2,
-    title: "Authentic Menus",
+    title: "Today's Menu",
     image: "/images/screens/screen2.jpeg",
-    description: "Explore curated menus filled with generations of flavor."
+    description: "Fresh menus posted daily by real cooks. Traditional dishes made with local ingredients."
   },
   {
     id: 3,
-    title: "Seamless Experience",
+    title: "From Kitchen to Door",
     image: "/images/screens/screen3.jpeg",
-    description: "Order with ease and track your meal from kitchen to doorstep."
+    description: "Order in seconds, track in real time. Your meal goes from a home kitchen straight to yours."
   }
 ];
 
-// ─── Premium easing (fast attack, smooth deceleration) ───────────
-const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const DURATION = 0.35;
-
-// ─── Preload images into browser cache ───────────────────────────
-function useImagePreload(srcs: string[]) {
-  useEffect(() => {
-    srcs.forEach((src) => {
-      const img = document.createElement('img');
-      img.src = src;
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-}
-
-// ─── Memoized Smartphone Mockup (pure presentational) ────────────
+// ─── Phone mockup ────────────────────────────────────────────────
 const SmartphoneMockup = memo(({ image }: { image: string }) => (
-  <div className="relative mx-auto w-full max-w-[300px] aspect-[9/19.5]">
-    {/* Outer Frame */}
-    <div className="absolute inset-0 bg-secondary rounded-[2.5rem] p-1.5 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] border-[3px] border-secondary/90 overflow-hidden">
-      {/* Internal Screen Border */}
-      <div className="absolute inset-0 border border-white/5 rounded-[2.2rem] pointer-events-none z-30" />
-
-      {/* Notch */}
-      <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-20 h-4 bg-secondary rounded-full z-40 flex items-center justify-center gap-1.5">
-        <div className="w-4 h-0.5 bg-white/10 rounded-full" />
+  <div className="relative w-[200px] h-[433px] sm:w-[220px] sm:h-[477px] lg:w-[200px] lg:h-[433px] xl:w-[220px] xl:h-[477px] mx-auto">
+    <div className="absolute inset-0 bg-secondary rounded-[2rem] p-1 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.25)] border-2 border-secondary/90 overflow-hidden">
+      <div className="absolute inset-0 border border-white/5 rounded-[1.8rem] pointer-events-none z-30" />
+      <div className="absolute top-1 left-1/2 -translate-x-1/2 w-16 h-3 bg-secondary rounded-full z-40 flex items-center justify-center gap-1">
+        <div className="w-3 h-0.5 bg-white/10 rounded-full" />
         <div className="w-1 h-1 bg-white/10 rounded-full" />
       </div>
-
-      {/* Screen Content */}
-      <div className="relative w-full h-full rounded-[2rem] overflow-hidden bg-gray-950 z-20">
-        <img
+      <div className="relative w-full h-full rounded-[1.6rem] overflow-hidden bg-gray-950 z-20">
+        <Image
           src={image}
-          alt="App Screen"
-          className="w-full h-full object-cover"
-          loading="eager"
-          decoding="async"
+          alt="TyebLiya app screen"
+          fill
+          sizes="220px"
+          className="object-cover"
+          quality={75}
         />
-        {/* Glass Reflection */}
         <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-white/5 pointer-events-none" />
-        {/* Home Indicator */}
-        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-white/20 rounded-full z-40" />
+        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-20 h-0.5 bg-white/20 rounded-full z-40" />
       </div>
     </div>
-
-    {/* Side Buttons */}
-    <div className="absolute -right-0.5 top-20 w-0.5 h-10 bg-secondary/30 rounded-l-sm" />
-    <div className="absolute -left-0.5 top-24 w-0.5 h-16 bg-secondary/30 rounded-r-sm" />
+    <div className="absolute -right-0.5 top-16 w-0.5 h-8 bg-secondary/30 rounded-l-sm" />
+    <div className="absolute -left-0.5 top-20 w-0.5 h-12 bg-secondary/30 rounded-r-sm" />
   </div>
 ));
 SmartphoneMockup.displayName = 'SmartphoneMockup';
@@ -80,30 +59,6 @@ SmartphoneMockup.displayName = 'SmartphoneMockup';
 // ─── Main Component ─────────────────────────────────────────────
 const AppScreens = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
-  const [hasEntered, setHasEntered] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Preload every screen image on mount
-  useImagePreload(screens.map((s) => s.image));
-
-  // Detect when section enters viewport (once)
-  useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasEntered(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
 
   const nextScreen = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % screens.length);
@@ -116,140 +71,119 @@ const AppScreens = () => {
   const goTo = useCallback((i: number) => setCurrentIndex(i), []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-32 md:py-48 bg-white overflow-hidden relative"
-    >
-      {/* Visual Divider */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
-
-      {/* Background glow */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-primary/5 rounded-full blur-[180px]" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[120px]" />
+    <section className="py-16 md:py-24 bg-white relative">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px]" />
       </div>
 
-      <div className="container px-4 mx-auto relative z-10">
-        {/* ── Section Header ── */}
-        <div className="max-w-4xl mx-auto text-center mb-24 md:mb-40">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
+        {/* ── Header ── */}
+        <div className="max-w-2xl mx-auto text-center mb-10 md:mb-14">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: EASE_OUT }}
-            className="inline-flex items-center gap-2 px-6 py-2.5 mb-10 bg-white rounded-2xl shadow-xl shadow-primary/5 border border-gray-100 text-primary font-black text-xs tracking-[0.3em] uppercase"
+            initial={REVEAL.initial}
+            whileInView={REVEAL.animate}
+            viewport={VIEWPORT}
+            transition={REVEAL.transition}
+            className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-white rounded-xl shadow-sm border border-gray-100 text-primary font-bold text-[11px] tracking-[0.2em] uppercase"
           >
-            <Sparkles size={16} className="animate-pulse" />
-            <span>Product Showcase</span>
+            <Heart size={14} fill="currentColor" />
+            <span>The App</span>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: EASE_OUT }}
-            className="text-6xl md:text-8xl font-black text-secondary mb-10 tracking-tight leading-none"
+            {...REVEAL_DELAY(0.06)}
+            whileInView={REVEAL.animate}
+            viewport={VIEWPORT}
+            className="text-2xl md:text-3xl font-bold text-secondary mb-3 tracking-tight leading-tight"
           >
-            See <span className="text-primary">TyebLiya</span> in Action
+            See the <span className="text-primary">Product.</span>
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.5, ease: EASE_OUT }}
-            className="text-2xl md:text-3xl text-secondary/60 font-medium leading-relaxed max-w-3xl mx-auto"
+            {...REVEAL_DELAY(0.12)}
+            whileInView={REVEAL.animate}
+            viewport={VIEWPORT}
+            className="text-base md:text-lg text-secondary/50 leading-relaxed max-w-xl mx-auto"
           >
-            Explore the app screens and get a taste of authentic local cuisine at your fingertips.
+            A preview of the TyebLiya app — designed for simplicity and trust.
           </motion.p>
         </div>
 
-        {/* ── Desktop Layout (lg+): 3 phones side-by-side ── */}
+        {/* ── Desktop (lg+): Phone row + side text ── */}
         <div className="hidden lg:block">
-          <div className="flex items-center justify-center gap-0 max-w-7xl mx-auto pb-28">
-            {screens.map((screen, i) => {
-              const isActive = i === currentIndex;
+          <div className="flex items-center justify-center gap-8 xl:gap-12">
+            {/* Phone trio */}
+            <motion.div
+              className="flex items-center justify-center flex-shrink-0"
+              initial={REVEAL.initial}
+              whileInView={REVEAL.animate}
+              viewport={VIEWPORT}
+              transition={{ duration: DURATION.slow, ease: EASE }}
+            >
+              {screens.map((screen, i) => {
+                const isActive = i === currentIndex;
+                return (
+                  <motion.div
+                    key={screen.id}
+                    className="relative flex-shrink-0 cursor-pointer"
+                    animate={{
+                      scale: isActive ? 1.05 : 0.9,
+                      opacity: isActive ? 1 : 0.4,
+                    }}
+                    transition={{ duration: DURATION.fast, ease: EASE }}
+                    style={{
+                      zIndex: isActive ? 30 : 10,
+                      margin: '0 -10px',
+                    }}
+                    onClick={() => goTo(i)}
+                  >
+                    <SmartphoneMockup image={screen.image} />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
 
-              return (
+            {/* Side text panel */}
+            <div className="max-w-xs flex-shrink-0">
+              <AnimatePresence mode="wait">
                 <motion.div
-                  key={screen.id}
-                  className="relative"
-                  // Entrance: stagger from left/right, only runs once
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{
-                    opacity: hasEntered ? (isActive ? 1 : 0.55) : 0,
-                    y: hasEntered ? 0 : 40,
-                    scale: isActive ? 1.1 : 0.9,
-                    filter: isActive ? 'grayscale(0)' : 'grayscale(0.5)',
-                  }}
-                  transition={{
-                    duration: hasEntered ? DURATION : 0.6,
-                    ease: EASE_OUT,
-                    delay: hasEntered ? 0 : i * 0.12,
-                  }}
-                  style={{
-                    zIndex: isActive ? 30 : 10,
-                    marginLeft: isActive ? -16 : 0,
-                    marginRight: isActive ? -16 : 0,
-                    cursor: 'pointer',
-                    willChange: 'transform, opacity',
-                  }}
-                  onClick={() => goTo(i)}
+                  key={currentIndex}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: DURATION.fast, ease: EASE }}
+                  className="space-y-3"
                 >
-                  <SmartphoneMockup image={screen.image} />
+                  <h4 className="text-xl font-bold text-secondary tracking-tight">
+                    {screens[currentIndex].title}
+                  </h4>
+                  <p className="text-sm text-secondary/50 leading-relaxed">
+                    {screens[currentIndex].description}
+                  </p>
                 </motion.div>
-              );
-            })}
-          </div>
+              </AnimatePresence>
 
-          {/* Desktop caption — below the phone row */}
-          <div className="text-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.25, ease: EASE_OUT }}
-              >
-                <h4 className="text-2xl font-black text-secondary mb-2">
-                  {screens[currentIndex].title}
-                </h4>
-                <p className="text-sm text-secondary/50 font-bold max-w-xs mx-auto">
-                  {screens[currentIndex].description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Desktop dot indicators */}
-            <div className="flex justify-center gap-3 mt-8">
-              {screens.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  aria-label={`Go to screen ${i + 1}`}
-                  className={`h-2.5 rounded-full transition-all duration-300 ease-out ${i === currentIndex
-                      ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
-                      : 'w-2.5 bg-gray-200 hover:bg-gray-300'
-                    }`}
-                />
-              ))}
+              <div className="flex gap-2 mt-6">
+                {screens.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goTo(i)}
+                    aria-label={`Screen ${i + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 ease-out ${i === currentIndex
+                      ? 'w-8 bg-primary shadow-[0_0_10px_rgba(255,107,53,0.3)]'
+                      : 'w-2 bg-gray-200 hover:bg-gray-300'
+                      }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ── Mobile / Tablet Layout (<lg): Stacked instant-switch ── */}
-        <div className="lg:hidden relative">
-          <div className="flex flex-col items-center">
-            {/*
-              All 3 screens live in the DOM simultaneously.
-              Active = opacity 1, scale 1. Inactive = opacity 0, scale 0.97.
-              → Zero unmount/remount. Zero image reload. Instant switch.
-            */}
-            <div
-              className="relative w-full max-w-[320px] mx-auto"
-              style={{ aspectRatio: '9/19.5' }}
-            >
+        {/* ── Mobile (<lg): Single phone + nav ── */}
+        <div className="lg:hidden">
+          <div className="relative flex flex-col items-center">
+            <div className="relative w-[200px] h-[433px] sm:w-[220px] sm:h-[477px] mx-auto">
               {screens.map((screen, i) => (
                 <motion.div
                   key={screen.id}
@@ -258,62 +192,59 @@ const AppScreens = () => {
                     opacity: i === currentIndex ? 1 : 0,
                     scale: i === currentIndex ? 1 : 0.97,
                   }}
-                  transition={{ duration: DURATION, ease: EASE_OUT }}
+                  transition={{ duration: DURATION.fast, ease: EASE }}
                   style={{
                     pointerEvents: i === currentIndex ? 'auto' : 'none',
-                    willChange: 'transform, opacity',
                   }}
                 >
                   <SmartphoneMockup image={screen.image} />
                 </motion.div>
               ))}
+
+              <button
+                onClick={prevScreen}
+                className="absolute -left-12 sm:-left-14 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-lg rounded-xl flex items-center justify-center text-secondary hover:text-primary active:scale-95 z-40 border border-gray-100 transition-colors duration-200"
+                aria-label="Previous"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={nextScreen}
+                className="absolute -right-12 sm:-right-14 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-lg rounded-xl flex items-center justify-center text-secondary hover:text-primary active:scale-95 z-40 border border-gray-100 transition-colors duration-200"
+                aria-label="Next"
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
 
-            {/* Navigation Buttons */}
-            <button
-              onClick={prevScreen}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow-2xl rounded-2xl flex items-center justify-center text-secondary hover:text-primary active:scale-90 z-40 border border-gray-100 transition-colors duration-200"
-              aria-label="Previous screen"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={nextScreen}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow-2xl rounded-2xl flex items-center justify-center text-secondary hover:text-primary active:scale-90 z-40 border border-gray-100 transition-colors duration-200"
-              aria-label="Next screen"
-            >
-              <ChevronRight size={24} />
-            </button>
-
-            {/* Text + Indicators */}
-            <div className="mt-16 text-center px-8">
+            <div className="mt-8 text-center px-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentIndex}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.25, ease: EASE_OUT }}
-                  className="space-y-4"
+                  transition={{ duration: DURATION.fast, ease: EASE }}
+                  className="space-y-2"
                 >
-                  <h4 className="text-3xl font-black text-secondary tracking-tight">
+                  <h4 className="text-lg font-bold text-secondary tracking-tight">
                     {screens[currentIndex].title}
                   </h4>
-                  <p className="text-lg text-secondary/60 font-medium leading-relaxed">
+                  <p className="text-sm text-secondary/50 leading-relaxed">
                     {screens[currentIndex].description}
                   </p>
                 </motion.div>
               </AnimatePresence>
 
-              <div className="flex justify-center gap-3 mt-10">
+              <div className="flex justify-center gap-2 mt-6">
                 {screens.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => goTo(i)}
-                    aria-label={`Go to screen ${i + 1}`}
-                    className={`h-2.5 rounded-full transition-all duration-300 ease-out ${i === currentIndex
-                        ? 'w-10 bg-primary shadow-[0_0_15px_rgba(255,107,53,0.4)]'
-                        : 'w-2.5 bg-gray-200'
+                    aria-label={`Screen ${i + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 ease-out ${i === currentIndex
+                      ? 'w-8 bg-primary shadow-[0_0_10px_rgba(255,107,53,0.3)]'
+                      : 'w-2 bg-gray-200'
                       }`}
                   />
                 ))}

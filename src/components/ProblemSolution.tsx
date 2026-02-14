@@ -2,98 +2,84 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Utensils, Heart, Users } from 'lucide-react';
+import { X, Check } from 'lucide-react';
+import { REVEAL, REVEAL_DELAY, VIEWPORT } from '@/lib/motion';
+
+const problemPoints = [
+  "Generic menus designed for speed, not quality",
+  "No connection between customer and cook",
+  "Home chefs with real skill but zero visibility",
+  "Customers want authentic food — and can't find it"
+];
+
+const solutionPoints = [
+  "A marketplace for verified home chefs",
+  "Fresh meals made to order, not reheated",
+  "Transparent profiles, ratings, and reviews",
+  "Direct support for people in your community"
+];
 
 const ProblemSolution = () => {
   return (
-    <section className="py-32 md:py-48 bg-white overflow-hidden relative">
-      {/* Subtle Background Accents */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[80px]" />
-      </div>
+    <section className="py-16 md:py-24 bg-white relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <div className="container px-4 mx-auto relative z-10">
-        <div className="max-w-5xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-24 md:mb-32">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-6 py-2.5 mb-10 bg-[#F8FAFC] rounded-2xl border border-gray-100 text-primary font-black text-xs tracking-[0.3em] uppercase"
-            >
-              <Sparkles size={16} />
-              <span>Why TyebLiya Exists</span>
-            </motion.div>
-            
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl font-black text-secondary mb-12 tracking-tight leading-[0.9]"
-            >
-              Food Should Feel <br />
-              <span className="text-primary italic">Personal</span> Again.
-            </motion.h2>
-          </div>
+          {/* THE PROBLEM */}
+          <motion.div
+            initial={REVEAL.initial}
+            whileInView={REVEAL.animate}
+            viewport={VIEWPORT}
+            transition={REVEAL.transition}
+            className="p-7 md:p-8 bg-gray-50 rounded-2xl border border-gray-100"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 bg-red-50 rounded-lg text-red-500 font-bold text-[10px] tracking-[0.2em] uppercase">
+              <X size={12} strokeWidth={3} />
+              <span>The Problem</span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-secondary mb-5 tracking-tight leading-tight">
+              Food delivery lost its soul.
+            </h2>
+            <ul className="space-y-3">
+              {problemPoints.map((point, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-secondary/60 leading-relaxed">
+                  <X size={14} className="text-red-400 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Problem Side */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="relative group"
-            >
-              <div className="absolute inset-0 bg-gray-50 rounded-[3rem] -rotate-1 group-hover:rotate-0 transition-transform duration-500 pointer-events-none" />
-              <div className="relative p-10 md:p-14 bg-white border border-gray-100 rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]">
-                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-8 text-secondary/30">
-                  <Utensils size={32} />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-secondary mb-6 tracking-tight uppercase">The Problem</h3>
-                <p className="text-xl md:text-2xl text-secondary/60 leading-relaxed font-medium">
-                  “Today’s delivery apps feel generic. You scroll endlessly without knowing who’s really behind the food.”
-                </p>
-              </div>
-            </motion.div>
+          {/* THE SOLUTION */}
+          <motion.div
+            {...REVEAL_DELAY(0.1)}
+            whileInView={REVEAL.animate}
+            viewport={VIEWPORT}
+            className="p-7 md:p-8 bg-primary rounded-2xl text-white"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 bg-white/15 rounded-lg text-white font-bold text-[10px] tracking-[0.2em] uppercase">
+              <Check size={12} strokeWidth={3} />
+              <span>The Solution</span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold mb-5 tracking-tight leading-tight">
+              TyebLiya brings it back.
+            </h2>
+            <ul className="space-y-3">
+              {solutionPoints.map((point, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-white/80 leading-relaxed">
+                  <Check size={14} className="text-white/50 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
 
-            {/* Solution Side */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="relative group"
-            >
-              <div className="absolute inset-0 bg-primary/5 rounded-[3rem] rotate-1 group-hover:rotate-0 transition-transform duration-500 pointer-events-none" />
-              <div className="relative p-10 md:p-14 bg-white border border-primary/10 rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(255,107,53,0.15)]">
-                <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-8 text-white shadow-lg shadow-primary/20">
-                  <Heart size={32} fill="currentColor" />
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black text-primary mb-6 tracking-tight uppercase">The Solution</h3>
-                <p className="text-xl md:text-2xl text-secondary leading-relaxed font-bold">
-                  “TyebLiya connects you directly with passionate local chefs — so every meal has a story, a culture, and a real person behind it.”
-                </p>
-                
-                <div className="mt-10 pt-8 border-t border-gray-50 flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    {[1, 2, 3, 4].map(i => (
-                      <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-gray-100 overflow-hidden">
-                        <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="Chef" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-2 text-primary font-black text-sm uppercase tracking-widest">
-                    <Users size={16} />
-                    <span>Meet Your Chefs</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            <div className="mt-6 pt-5 border-t border-white/10">
+              <p className="text-xs text-white/40 font-medium">
+                Not a delivery app. A home chef marketplace.
+              </p>
+            </div>
+          </motion.div>
+
         </div>
       </div>
     </section>

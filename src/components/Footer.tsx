@@ -1,28 +1,38 @@
+'use client';
+
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Instagram, Facebook, Linkedin, UtensilsCrossed } from 'lucide-react';
+import { EASE, DURATION, VIEWPORT } from '@/lib/motion';
 
 const Footer = () => {
   return (
-    <footer className="py-16 bg-white border-t border-gray-100">
-      <div className="container px-4 mx-auto">
+    <motion.footer
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={VIEWPORT}
+      transition={{ duration: DURATION.normal, ease: EASE }}
+      className="py-10 bg-white border-t border-gray-100"
+    >
+      <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col items-center">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-              <UtensilsCrossed size={20} />
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+              <UtensilsCrossed size={16} />
             </div>
-            <span className="text-2xl font-black text-secondary tracking-tighter">
+            <span className="text-lg font-bold text-secondary tracking-tight">
               TyebLiya
             </span>
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-10">
+          <nav className="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-6">
             {['Privacy Policy', 'Terms', 'Contact'].map((item) => (
-              <a 
-                key={item} 
-                href="#" 
-                className="text-sm font-bold text-secondary/40 hover:text-primary transition-colors"
+              <a
+                key={item}
+                href="#"
+                className="text-xs font-medium text-secondary/40 hover:text-primary transition-colors duration-200"
               >
                 {item}
               </a>
@@ -30,32 +40,30 @@ const Footer = () => {
           </nav>
 
           {/* Social Icons */}
-          <div className="flex items-center gap-6 mb-12">
+          <div className="flex items-center gap-3 mb-6">
             {[
               { Icon: Instagram, href: '#', label: 'Instagram' },
               { Icon: Facebook, href: '#', label: 'Facebook' },
               { Icon: Linkedin, href: '#', label: 'LinkedIn' }
             ].map(({ Icon, href, label }) => (
-              <a 
+              <a
                 key={label}
                 href={href}
-                className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-secondary/40 hover:bg-primary hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-primary/20"
+                className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-secondary/30 hover:bg-primary hover:text-white transition-colors duration-200"
                 aria-label={label}
               >
-                <Icon size={20} />
+                <Icon size={16} />
               </a>
             ))}
           </div>
 
-          {/* Copyright & Microcopy */}
-          <div className="text-center">
-            <p className="text-sm font-bold text-secondary/40">
-              © 2026 TyebLiya — Connecting Food Lovers & Chefs
-            </p>
-          </div>
+          {/* Copyright */}
+          <p className="text-xs text-secondary/30">
+            © 2026 TyebLiya — Home food, made with heart.
+          </p>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

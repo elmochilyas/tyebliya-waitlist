@@ -1,10 +1,13 @@
+import dynamic from 'next/dynamic';
 import Hero from '@/components/Hero';
-import ProblemSolution from '@/components/ProblemSolution';
-import Features from '@/components/Features';
-import AppScreens from '@/components/AppScreens';
-import WaitlistForm from '@/components/WaitlistForm';
-import TargetAudience from '@/components/TargetAudience';
-import Footer from '@/components/Footer';
+
+// Below-the-fold sections: lazy-loaded to reduce initial JS bundle
+const ProblemSolution = dynamic(() => import('@/components/ProblemSolution'));
+const Features = dynamic(() => import('@/components/Features'));
+const AppScreens = dynamic(() => import('@/components/AppScreens'));
+const TargetAudience = dynamic(() => import('@/components/TargetAudience'));
+const WaitlistForm = dynamic(() => import('@/components/WaitlistForm'));
+const Footer = dynamic(() => import('@/components/Footer'));
 
 export default function Home() {
   return (
@@ -13,8 +16,8 @@ export default function Home() {
       <ProblemSolution />
       <Features />
       <AppScreens />
-      <WaitlistForm />
       <TargetAudience />
+      <WaitlistForm />
       <Footer />
     </main>
   );
